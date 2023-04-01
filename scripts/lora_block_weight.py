@@ -398,14 +398,12 @@ def loradealer(prompts,lratios):
     calledloras = extra_network_data["lora"]
     lorans = []
     lorars = []
-    multipliers = []
     for called in calledloras:
         if len(called.items) <3:continue
         if called.items[2] in lratios or called.items[2].count(",") ==16 or called.items[2].count(",") ==25:
             lorans.append(called.items[0])
             wei = lratios[called.items[2]] if called.items[2] in lratios else called.items[2] 
             multiple = float(called.items[1])
-            multipliers.append(multiple)
             ratios = [w.strip() for w in wei.split(",")]
             for i,r in enumerate(ratios):
                 if r =="R":
@@ -421,7 +419,7 @@ def loradealer(prompts,lratios):
             if len(ratios)==17:
                 ratios = [ratios[0]] + [1] + ratios[1:3]+ [1] + ratios[3:5]+[1] + ratios[5:7]+[1,1,1] + [ratios[7]] + [1,1,1] + ratios[8:]
             lorars.append(ratios)
-    if len(lorars) > 0: load_loras_blocks(lorans,lorars,multipliers)
+    if len(lorars) > 0: load_loras_blocks(lorans,lorars,multiple)
 
 re_inherited_weight = re.compile(r"X([+-])?([\d.]+)?")
 
@@ -434,7 +432,7 @@ def getinheritedweight(weight, offset):
     else:
         return float(weight) 
 
-def load_loras_blocks(names, lwei=None,multipliers = None):
+def load_loras_blocks(names, lwei=None,multi=1.0):
     import lora
     lora.loaded_loras.clear()
 
@@ -454,7 +452,7 @@ def load_loras_blocks(names, lwei=None,multipliers = None):
         else:
             locallora = lbw(locallora,lwei[i])
 
-        locallora.multiplier = multipliers[i]
+        locallora.multiplier = multi
         lora.loaded_loras.append(locallora)
 
 def smakegrid(imgs,xs,ys,currentmodel,p):
